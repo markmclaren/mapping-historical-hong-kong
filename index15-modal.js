@@ -276,9 +276,9 @@ function updateSlider() {
 }
 
 function filterBy(year) {
-  // Hide all layers
+  // Hide all historical layers
   map.getStyle().layers.forEach(function (layer) {
-    if (layer.source != "maptiler_planet") {
+    if (layer.source === "example_source") {
       if (
         layer.type === "fill" ||
         layer.type === "line" ||
@@ -293,7 +293,7 @@ function filterBy(year) {
   // Show only layers corresponding to the selected year
   const yearString = year.toString();
   map.getStyle().layers.forEach(function (layer) {
-    if (layer.source != "maptiler_planet" && layer.id.includes(yearString)) {
+    if (layer.source === "example_source" && layer.id.includes(yearString)) {
       if (!layer.id.includes("hover")) {
         targets[layer.id] = layer.id;
       }
@@ -347,8 +347,7 @@ window.addEventListener("load", (event) => {
       container: "map",
       zoom: h.maxZoom,
       center: [h.centerLon, h.centerLat],
-      style:
-        "https://api.maptiler.com/maps/dataviz-light/style.json?key=DhInd57wi3xMJdcrgKlv",
+      style: "https://tiles.openfreemap.org/styles/positron",
     });
 
     // Make sure the map resizes properly with the window
@@ -357,6 +356,14 @@ window.addEventListener("load", (event) => {
     });
 
     map.on("load", function () {
+      // Match the lighter water colour from the original MapTiler dataviz-light style
+      if (map.getLayer("water")) {
+        map.setPaintProperty("water", "fill-color", "hsl(240, 2%, 88%)");
+      }
+      if (map.getLayer("waterway")) {
+        map.setPaintProperty("waterway", "line-color", "hsl(240, 2%, 88%)");
+      }
+
       map.addSource("example_source", {
         type: "vector",
         url: `pmtiles://${PMTILES_URL}`,
